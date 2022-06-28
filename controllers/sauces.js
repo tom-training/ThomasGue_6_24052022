@@ -116,12 +116,7 @@ exports.postLikeModelsSauce = (req, res, next)=>{
         default: 
             console.log('aucun cas de figure');
 
-
-
-
-    }
-
-           
+    }           
 };
 
 
@@ -137,25 +132,45 @@ exports.putModelsSauce = (req, res, next)=> {
          imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
 
      } : { ...req.body};
+
      console.log(sauceObject);
 
      console.log(sauceObject.userId);
 
-     // if sauceObject.userId === res.locals.auteurId{
+    // tout le code ModelsSauce.updateOne()
+    if(sauceObject.userId !== res.locals.auteurId){
+        res.status(403).json({
+            message: 'Unauthorized request!'
+        });
+    }
 
-        // tout le code ModelsSauce.updateOne()
-
-     //}else{envoi d'une erreur 403}
     ModelsSauce.updateOne({_id: req.params.id}, { ...sauceObject, _id: req.params.id})
     .then(()=> res.status(200).json({ message: 'Objet modifié'}))
     .catch(error => res.status(400).json({error}));
 };
 
 exports.deleteModelsSauce = (req, res, next) => {
+    console.log('attention fonction delete check');
+    console.log(res.locals.auteurId);
+
+
 
     console.log(req.params.id);
+
     ModelsSauce.findOne({_id: req.params.id})
       .then(modelsSauce => {
+
+        console.log(modelsSauce);
+        console.log(modelsSauce.userId);
+
+        if(modelsSauce.userId !== res.locals.auteurId){
+            res.status(403).json({
+                message: 'Unauthorized request!'
+            });
+        }
+
+        console.log(modelsSauce.userId === res.locals.auteurId);
+
         const filename = modelsSauce.imageUrl.split('/images/')[1];
         fs.unlink(`images/${filename}`, () => {
           ModelsSauce.deleteOne({ _id: req.params.id })
