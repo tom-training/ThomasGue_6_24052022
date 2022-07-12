@@ -129,6 +129,7 @@ exports.putModelsSauce = (req, res, next)=> {
     const sauceObject = req.file ?
      { 
          ...JSON.parse(req.body.sauce),
+         
          imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
 
      } : { ...req.body};
@@ -147,13 +148,14 @@ exports.putModelsSauce = (req, res, next)=> {
     ModelsSauce.updateOne({_id: req.params.id}, { ...sauceObject, _id: req.params.id})
     .then(()=> res.status(200).json({ message: 'Objet modifié'}))
     .catch(error => res.status(400).json({error}));
+
+
+
 };
 
 exports.deleteModelsSauce = (req, res, next) => {
     console.log('attention fonction delete check');
     console.log(res.locals.auteurId);
-
-
 
     console.log(req.params.id);
 

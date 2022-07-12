@@ -26,8 +26,8 @@ module.exports = (req, res, next)=> {
 };
 
 
-// attention une fois que la route sauces.js (les routes (stuff.js)) seront
-// crées les routes devront contenir auth juste l'appel à la logique métier
+// attention une fois que la route sauces.js seront
+// crées les routes devront contenir auth juste avant l'appel à la logique métier
 // par son contrôlleur
 
 /*
