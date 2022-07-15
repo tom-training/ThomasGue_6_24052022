@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 // const dotenv =  require('dotenv').config();
-
+// cette ligne de code ci-dessus est à rajouter dans le app.js
 
 exports.signup = (req, res, next)=>{
     bcrypt.hash(req.body.password, 10)

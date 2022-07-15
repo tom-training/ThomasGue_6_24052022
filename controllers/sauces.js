@@ -2,16 +2,26 @@ const ModelsSauce = require('../models/ModelsSauce');
 
 const fs = require('fs');
 
+/* function qui va être utiliser par le router: 
+ router.post('/', auth, multer, saucesCtrl.postModelsSauce);  */
+
+
 exports.postModelsSauce = (req, res, next)=>{
 
     const sauceObject = JSON.parse(req.body.sauce);  
 
-    console.log(" sauceObject apres parsing ");
-    console.log(sauceObject);
-    //delete sauceObject._id; // peut-être pas nécessaire
+// console.log(" sauceObject apres parsing ");
+// console.log(sauceObject);
+// en ajoutant multer, le format de la requête POST a changé
+// JSON.parse permet de récupéré le contenu de body des requêtes
+// lorsqu'un fichier est rajouté à la requête, les données de la requête sont 
+// envoyées sous la forme form-data (et plus sous le format json), le corps de la
+// requête contient dès lors une chaine thing, c'est JSON.parse qui nous permet
+// un objet utilisable
 
     const modelsSauce = new ModelsSauce({
         ...sauceObject,
+        // rajouter un UserId issue de l'authentification middleware/auth
         imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     });
 
@@ -22,9 +32,9 @@ exports.postModelsSauce = (req, res, next)=>{
 
 exports.postLikeModelsSauce = (req, res, next)=>{
 
-    console.log(req.body.userId);
+    // console.log(req.body.userId);
 
-    console.log(req.body.like);
+    // console.log(req.body.like);
 
     switch(req.body.like){
 
@@ -33,6 +43,8 @@ exports.postLikeModelsSauce = (req, res, next)=>{
 
                 $inc : {'likes' : 1},
                 $push: { usersLiked: req.body.userId } 
+
+                // ci-dessus le tableau des usersLiked est incrémenté
             })
     
             .then(()=>res.status(201).json({message: 'Like crée'}))
@@ -49,7 +61,6 @@ exports.postLikeModelsSauce = (req, res, next)=>{
                 $inc : {'dislikes' : 1},
                 $push: { usersDisliked: req.body.userId } 
             })
-        
                 .then(()=>res.status(201).json({message: 'Like crée'}))
                 .catch(error=> res.status(400).json({error}));
 
@@ -60,19 +71,25 @@ exports.postLikeModelsSauce = (req, res, next)=>{
             
             ModelsSauce.findOne({_id: req.params.id})
             .then(object=> {
-                console.log(object.userId);
-                console.log(typeof object.usersDisliked);
-                console.log(typeof object.usersLiked);
+                //console.log(object.userId);
+                //console.log(typeof object.usersDisliked);
+                //console.log(typeof object.usersLiked);
 
                 let monTableauDisliked = object.usersDisliked;
+                
+                /*
                 for (const i of monTableauDisliked){
                     console.log(i);
                 }
-
+                */
+                
                 let monTableauLiked = object.usersLiked;
+                
+                /*
                 for (const j of monTableauLiked){
                     console.log(j);
                 }
+                */
 
                 if(monTableauLiked.includes(req.body.userId) === true){
                     
@@ -102,9 +119,6 @@ exports.postLikeModelsSauce = (req, res, next)=>{
                     });
                 }
 
-                
-
-                //res.status(201).json({message: "on n'est dans aucun cas de figure"});
             })
             .catch(error=> {
                 console.log(error);    
@@ -122,23 +136,25 @@ exports.postLikeModelsSauce = (req, res, next)=>{
 
 exports.putModelsSauce = (req, res, next)=> {
 
-    console.log(res.locals.auteurId);
-
-    // vérifier que cet id ci-dessus est égal à l'id de l'auteur de la sauce
+    //console.log(res.locals.auteurId);
+    //console.log ci-dessus pour vérifier que cet id ci-dessus 
+    //est égal à l'id de l'auteur de la sauce
 
     const sauceObject = req.file ?
      { 
          ...JSON.parse(req.body.sauce),
-         
+        
          imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
 
      } : { ...req.body};
 
-     console.log(sauceObject);
+     //console.log(sauceObject);
 
-     console.log(sauceObject.userId);
+     //console.log(sauceObject.userId);
 
     // tout le code ModelsSauce.updateOne()
+
+    // res.locals.auteurId provient du middleware/auth.js
     if(sauceObject.userId !== res.locals.auteurId){
         res.status(403).json({
             message: 'Unauthorized request!'
@@ -149,21 +165,19 @@ exports.putModelsSauce = (req, res, next)=> {
     .then(()=> res.status(200).json({ message: 'Objet modifié'}))
     .catch(error => res.status(400).json({error}));
 
-
-
 };
 
 exports.deleteModelsSauce = (req, res, next) => {
-    console.log('attention fonction delete check');
-    console.log(res.locals.auteurId);
+    //console.log('attention fonction delete check');
+    //console.log(res.locals.auteurId);
 
-    console.log(req.params.id);
+    //console.log(req.params.id);
 
     ModelsSauce.findOne({_id: req.params.id})
       .then(modelsSauce => {
 
-        console.log(modelsSauce);
-        console.log(modelsSauce.userId);
+        //console.log(modelsSauce);
+        //console.log(modelsSauce.userId);
 
         if(modelsSauce.userId !== res.locals.auteurId){
             res.status(403).json({
@@ -171,7 +185,7 @@ exports.deleteModelsSauce = (req, res, next) => {
             });
         }
 
-        console.log(modelsSauce.userId === res.locals.auteurId);
+        //console.log(modelsSauce.userId === res.locals.auteurId);
 
         const filename = modelsSauce.imageUrl.split('/images/')[1];
         fs.unlink(`images/${filename}`, () => {

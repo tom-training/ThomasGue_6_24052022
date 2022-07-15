@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 
 //require('dotenv').config();
-
+// là encore cette ligne de code doit être ajouté à app.js
 
 
 module.exports = (req, res, next)=> {
@@ -15,7 +15,7 @@ module.exports = (req, res, next)=> {
             throw 'User ID non valable';
         }else{
 
-            console.log(userId);
+            //console.log(userId);
             res.locals.auteurId = userId;
             next();
         }
@@ -32,6 +32,5 @@ module.exports = (req, res, next)=> {
 
 /*
 il faudra importer 
-
 const auth = require('../middleware/auth');
 */
