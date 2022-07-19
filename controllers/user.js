@@ -7,6 +7,49 @@ const User = require('../models/User');
 // cette ligne de code ci-dessus est à rajouter dans le app.js
 
 exports.signup = (req, res, next)=>{
+
+    //console.log(req.body.email);
+
+    var regexCourriel = /.+@.+\..+/;
+    //console.log(!regexCourriel.test(req.body.email));
+
+    if(!regexCourriel.test(req.body.email)){
+        return res.status(403).json({
+            message: 'Unauthorized email!'
+        });
+    }
+
+    //console.log(req.body.password.length);
+    if(req.body.password.length<8){
+        return res.status(403).json({
+            message: 'the password should be at least of 8 characters or more'
+        });
+    }
+    
+    var regexMdpSC = /[!"#$%&'()*+,./:;<=>?@[^_`{|}~\-\]]/;
+    if(!regexMdpSC.test(req.body.password)){
+
+        return res.status(403).json({
+            message: 'the password should contain at least one special character'
+        });
+    };
+
+    var regexMdpUC = /[A-Z]/;
+
+    if(!regexMdpUC.test(req.body.password)){
+        return res.status(403).json({
+            message: 'the password should contain at least one upper case letter'
+        });
+    };
+
+    var regexMdpLC = /[a-z]/;
+
+    if(!regexMdpLC.test(req.body.password)){
+        return res.status(403).json({
+            message: 'the password should contain at least one lower case letter'
+        });
+    };
+
     bcrypt.hash(req.body.password, 10)
         .then(hash=> {
                             const user = new User({

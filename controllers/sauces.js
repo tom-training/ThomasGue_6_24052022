@@ -136,10 +136,38 @@ exports.postLikeModelsSauce = (req, res, next)=>{
 
 exports.putModelsSauce = (req, res, next)=> {
 
-    //console.log(res.locals.auteurId);
-    //console.log ci-dessus pour vérifier que cet id ci-dessus 
-    //est égal à l'id de l'auteur de la sauce
+    var sauceObject = {};
 
+    if(req.file){
+        //console.log('quid du req.params.id');
+        //console.log(req.params.id);
+
+        ModelsSauce.findOne({_id: req.params.id})
+            .then(modelsSauce => {
+        
+                if(modelsSauce.userId !== res.locals.auteurId){
+                    res.status(403).json({
+                        message: 'Unauthorized request!'
+                    });
+                }
+        
+                const fileexname = modelsSauce.imageUrl.split('/images/')[1];
+                fs.unlink(`images/${fileexname}`, () => {
+                    console.log("suppression de l'ancien fichier image");
+                });
+              })
+            .catch(error => res.status(500).json({ error: error }));
+
+        sauceObject ={
+            ...JSON.parse(req.body.sauce),
+        
+            imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+        }
+    }else{
+        sauceObject = { ...req.body}
+    }
+
+    /*
     const sauceObject = req.file ?
      { 
          ...JSON.parse(req.body.sauce),
@@ -148,6 +176,21 @@ exports.putModelsSauce = (req, res, next)=> {
 
      } : { ...req.body};
 
+    */ 
+
+    if(sauceObject.userId !== res.locals.auteurId){
+        res.status(403).json({
+            message: 'Unauthorized request!'
+        });
+    }
+    
+  
+    //console.log(res.locals.auteurId);
+    //console.log ci-dessus pour vérifier que cet id ci-dessus 
+    //est égal à l'id de l'auteur de la sauce
+
+    
+
      //console.log(sauceObject);
 
      //console.log(sauceObject.userId);
@@ -155,15 +198,13 @@ exports.putModelsSauce = (req, res, next)=> {
     // tout le code ModelsSauce.updateOne()
 
     // res.locals.auteurId provient du middleware/auth.js
-    if(sauceObject.userId !== res.locals.auteurId){
-        res.status(403).json({
-            message: 'Unauthorized request!'
-        });
-    }
+  
 
     ModelsSauce.updateOne({_id: req.params.id}, { ...sauceObject, _id: req.params.id})
     .then(()=> res.status(200).json({ message: 'Objet modifié'}))
     .catch(error => res.status(400).json({error}));
+
+   
 
 };
 
