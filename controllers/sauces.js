@@ -39,6 +39,32 @@ exports.postLikeModelsSauce = (req, res, next)=>{
     switch(req.body.like){
 
         case 1: 
+
+            ModelsSauce.findOne({_id: req.params.id})
+            .then(object=> {
+                
+                let monTableauDisliked = object.usersDisliked;
+                
+                let monTableauLiked = object.usersLiked;
+
+                if(monTableauLiked.includes(req.body.userId) === true){
+                    
+                    return res.status(403).json({message: 'Like unauthorized'})
+                }
+
+                if(monTableauDisliked.includes(req.body.userId) === true){
+
+                    return res.status(403).json({message: 'Like unauthorized'})
+                }
+
+            })
+            .catch(error=> {
+
+                res.status(404).json({error})
+            }); 
+
+            // si on arrive jusqu'ici c'est que l'utilisateur ne vote pas une
+            // seconde fois
             ModelsSauce.updateOne({_id: req.params.id}, { 
 
                 $inc : {'likes' : 1},
@@ -56,6 +82,33 @@ exports.postLikeModelsSauce = (req, res, next)=>{
         break;
 
         case -1:
+
+            ModelsSauce.findOne({_id: req.params.id})
+            .then(object=> {
+                
+                let monTableauDisliked = object.usersDisliked;
+                
+                let monTableauLiked = object.usersLiked;
+
+                if(monTableauLiked.includes(req.body.userId) === true){
+                    
+                    return res.status(403).json({message: 'Dislike unauthorized'})
+                }
+
+                if(monTableauDisliked.includes(req.body.userId) === true){
+
+                    return res.status(403).json({message: 'Dislike unauthorized'})
+                }
+
+            })
+            .catch(error=> {
+
+                res.status(404).json({error})
+            }); 
+
+            // si on arrive jusqu'ici c'est que l'utilisateur ne vote pas une
+            // seconde fois
+
             ModelsSauce.updateOne({_id: req.params.id}, { 
 
                 $inc : {'dislikes' : 1},
@@ -71,25 +124,11 @@ exports.postLikeModelsSauce = (req, res, next)=>{
             
             ModelsSauce.findOne({_id: req.params.id})
             .then(object=> {
-                //console.log(object.userId);
-                //console.log(typeof object.usersDisliked);
-                //console.log(typeof object.usersLiked);
-
+ 
                 let monTableauDisliked = object.usersDisliked;
-                
-                /*
-                for (const i of monTableauDisliked){
-                    console.log(i);
-                }
-                */
-                
+                                
                 let monTableauLiked = object.usersLiked;
                 
-                /*
-                for (const j of monTableauLiked){
-                    console.log(j);
-                }
-                */
 
                 if(monTableauLiked.includes(req.body.userId) === true){
                     
@@ -100,7 +139,7 @@ exports.postLikeModelsSauce = (req, res, next)=>{
                     })
                     .then(()=>res.status(201).json({message: 'Like crée puis retiré'}))
                     .catch(error=> {
-                        console.log(error);   
+                        //console.log(error);   
                         res.status(400).json({error})
                     });
                 }

@@ -10,7 +10,7 @@ exports.signup = (req, res, next)=>{
 
     //console.log(req.body.email);
 
-    var regexCourriel = /.+@.+\..+/;
+    var regexCourriel = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
     //console.log(!regexCourriel.test(req.body.email));
 
     if(!regexCourriel.test(req.body.email)){
