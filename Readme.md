@@ -1,3 +1,33 @@
+0- git clone https://github.com/nom-du-compte-github/nom-de-l-api.git backend 
+
+1- créer le fichier .env avec les clés/valeurs listés dans .env-sample
+    les valeurs seront communiqués séparément pour raisons de sécurité
+
+2- Avec la commande "npm install" procéder à l'installation des packages suivants:
+    "bcrypt"
+    "cors"
+    "dotenv"
+    "express"
+    "jsonwebtoken"
+    "mongoose"
+    "mongoose-unique-validator"
+    "multer"
+    "nodemon"
+    "password-validator"
+    "path"
+pour référence consulter package.json ligne 11 "dependencies"
+
+3- Installer nodemon avec la commande "npm install -g nodemon"
+
+4- Pour démarrer le serveur côté backend: dans votre terminal rooter sur le répertoire ("backend" dans le cas présent) contenant les fichiers de backend issue de votre git clone effectué à l'étape 0- et effectuer la commande
+"nodemon server"
+
+5- Pour démarrer le serveur côté frontend: dans votre terminal rooter sur le répertoire des fichiers de frontend et lancer la commande "npm run start"
+
+
+
+---------------------------Autres informations------------------------------------
+
 server.js   : "main file" appel http pour créer le serveur de base, va appeller app.js pour son fonctionnement
 
 app.js  :  fait appel aux fichiers routes pour les routes user et sauces 

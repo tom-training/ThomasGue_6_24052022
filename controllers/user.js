@@ -3,6 +3,10 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
+const passwordValidator = require('password-validator');
+
+var schema = new passwordValidator();
+
 // const dotenv =  require('dotenv').config();
 // cette ligne de code ci-dessus est à rajouter dans le app.js
 
@@ -18,7 +22,7 @@ exports.signup = (req, res, next)=>{
             message: 'Unauthorized email!'
         });
     }
-
+    /*
     //console.log(req.body.password.length);
     if(req.body.password.length<8){
         return res.status(403).json({
@@ -49,6 +53,20 @@ exports.signup = (req, res, next)=>{
             message: 'the password should contain at least one lower case letter'
         });
     };
+    */
+
+    schema
+    .is().min(8)
+    .is().max(100)
+    .has().uppercase()
+    .has().lowercase()
+    .has().symbols()
+    .has().not().spaces();
+
+    if(!schema.validate(req.body.password)){
+        return res.status(403).json({message: 'the password is invalid, the password should contain at least one lower case, one upper case and one special character'})
+    }
+
 
     bcrypt.hash(req.body.password, 10)
         .then(hash=> {
